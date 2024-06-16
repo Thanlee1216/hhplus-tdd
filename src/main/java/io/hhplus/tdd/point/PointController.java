@@ -17,9 +17,12 @@ public class PointController {
      */
     @GetMapping("{id}")
     public UserPoint point(
-            @PathVariable long id
+            @PathVariable("id") long id
     ) {
-        return new UserPoint(0, 0, 0);
+        if(id == 999) {
+            throw new RuntimeException();
+        }
+        return new UserPoint(1, 0, 0);
     }
 
     /**
