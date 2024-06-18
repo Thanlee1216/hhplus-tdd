@@ -43,7 +43,11 @@ public class PointController {
     public List<PointHistory> history(
             @PathVariable("id") long id
     ) {
-        return List.of();
+        try {
+            return pointService.getPointHistory(id);
+        }catch (NullPointerException e) {
+            throw new PointException("NOT_EXIST_USER");
+        }
     }
 
     /**
@@ -54,7 +58,11 @@ public class PointController {
             @PathVariable("id") long id,
             @RequestBody long amount
     ) {
-        return new UserPoint(0, 0, 0);
+        try {
+            return pointService.chargePoint(id, amount);
+        }catch (NullPointerException e) {
+            throw new PointException("NOT_EXIST_USER");
+        }
     }
 
     /**
@@ -65,6 +73,10 @@ public class PointController {
             @PathVariable("id") long id,
             @RequestBody long amount
     ) {
-        return new UserPoint(0, 0, 0);
+        try {
+            return pointService.usePoint(id, amount);
+        }catch (NullPointerException e) {
+            throw new PointException("NOT_EXIST_USER");
+        }
     }
 }
