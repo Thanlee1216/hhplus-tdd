@@ -3,6 +3,7 @@ package io.hhplus.tdd.point;
 import io.hhplus.tdd.exception.ExceptionType;
 import io.hhplus.tdd.point.controller.PointController;
 import io.hhplus.tdd.point.service.PointService;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,6 +32,13 @@ class PointControllerTest {
 
     @MockBean
     PointService pointService;
+    
+    long id;
+
+    @BeforeEach
+    void setUp() {
+        id = 1L;
+    }
 
     /**
      * id에 해당하는 유저를 조회해오기 위한 테스트
@@ -38,9 +46,6 @@ class PointControllerTest {
      */
     @Test
     void 유저_조회() throws Exception {
-
-        //Case 1 : id가 1인 유저 조회
-        long id = 1;
 
         //MockBean 객체의 역할 부여
         UserPoint userPoint = new UserPoint(id, 0, 0);
@@ -60,9 +65,6 @@ class PointControllerTest {
     @Test
     void 유저_조회_실패() throws Exception {
 
-        //Case 2 : id가 999인 유저 조회
-        long id = 999;
-
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
         when(pointService.getUserPoint(id)).thenThrow(NullPointerException.class);
@@ -81,9 +83,6 @@ class PointControllerTest {
     @Test
     void 유저_포인트_내역_조회() throws Exception {
 
-        //Case 1 : id가 1인 유저 조회
-        long id = 1;
-
         //MockBean 객체의 역할 부여
         when(pointService.getPointHistory(id)).thenReturn(List.of(new PointHistory(1, id, 100, TransactionType.CHARGE, 0)));
 
@@ -101,12 +100,9 @@ class PointControllerTest {
     @Test
     void 유저_포인트_내역_조회_실패() throws Exception {
 
-        //Case 2 : id가 999인 유저 조회
-        long id = 999;
-
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
-        when(pointService.getUserPoint(id)).thenThrow(NullPointerException.class);
+        when(pointService.getPointHistory(id)).thenThrow(NullPointerException.class);
 
         ResultActions resultAcitons = mockMvc.perform(get("/point/" + id + "/histories"));
 
@@ -122,10 +118,8 @@ class PointControllerTest {
     @Test
     void 유저_포인트_충전() throws Exception {
 
-        //Case 1 : id가 1인 유저 조회
-        long id = 1;
-        long amount = 100;
-        long defaultAmount = 0; //기존 포인트
+        long amount = 100L;
+        long defaultAmount = 0L; //기존 포인트
 
         //MockBean 객체의 역할 부여
         UserPoint userPoint = new UserPoint(id, defaultAmount + amount, 0);
@@ -146,9 +140,7 @@ class PointControllerTest {
     @Test
     void 유저_포인트_충전_실패() throws Exception {
 
-        //Case 2 : id가 999인 유저 조회
-        long id = 999;
-        long amount = 100;
+        long amount = 100L;
 
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
@@ -168,10 +160,8 @@ class PointControllerTest {
     @Test
     void 유저_포인트_사용() throws Exception {
 
-        //Case 1 : id가 1인 유저 조회
-        long id = 1;
-        long amount = 100;
-        long defaultAmount = 200; //기존 포인트
+        long amount = 100L;
+        long defaultAmount = 200L; //기존 포인트
 
         //MockBean 객체의 역할 부여
         UserPoint userPoint = new UserPoint(id, defaultAmount - amount, 0);
@@ -192,9 +182,7 @@ class PointControllerTest {
     @Test
     void 유저_포인트_사용_실패() throws Exception {
 
-        //Case 2 : id가 999인 유저 조회
-        long id = 999;
-        long amount = 100;
+        long amount = 100L;
 
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
