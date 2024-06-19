@@ -42,10 +42,12 @@ class PointControllerTest {
 
     /**
      * id에 해당하는 유저를 조회해오기 위한 테스트
+     * 존재하지 않는 유저는 신규로 생성
+     * 신규 유저를 생성할 때 정보를 기입하거나 신규 유저로 등록되었다는 메세지 리턴은 요구사항이 없기에 제외
      * @throws Exception
      */
     @Test
-    void 유저_조회() throws Exception {
+    void 유저를_조회하고_존재하지_않는_유저_조회_시_신규_유저로_등록한다() throws Exception {
 
         //MockBean 객체의 역할 부여
         UserPoint userPoint = new UserPoint(id, 0, 0);
@@ -56,24 +58,6 @@ class PointControllerTest {
         resultAcitons.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id));
-    }
-
-    /**
-     * id에 해당하는 유저가 존재하지 않을 경우의 테스트
-     * @throws Exception
-     */
-    @Test
-    void 유저_조회_실패() throws Exception {
-
-        //MockBean 객체의 역할 부여
-        //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
-        when(pointService.getUserPoint(id)).thenThrow(NullPointerException.class);
-
-        ResultActions resultAcitons = mockMvc.perform(get("/point/" + id));
-
-        resultAcitons.andDo(print())
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("NOT_EXIST_USER")));
     }
 
     /**

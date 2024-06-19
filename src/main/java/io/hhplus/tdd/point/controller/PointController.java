@@ -29,11 +29,7 @@ public class PointController {
     public UserPoint point(
             @PathVariable("id") long id
     ) {
-        try {
-            return pointService.getUserPoint(id);
-        }catch (NullPointerException e) {
-            throw new PointException("NOT_EXIST_USER");
-        }
+        return pointService.getUserPoint(id);
     }
 
     /**
