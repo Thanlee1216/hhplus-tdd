@@ -209,6 +209,24 @@ class PointServiceTest {
     }
 
     /**
+     * 보유중인 포인트보다 많은 포인트를 사용하는 테스트
+     */
+    @Test
+    void 보유중인_포인트보다_많은_포인트를_사용하면_예외가_발생한다() {
+        //given
+        UserPoint userPoint = UserPoint.empty(1L);
+        long usePoint = 1000L;
+        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1, userPoint.id(), 0, TransactionType.USE, 0)));
+        when(pointRepository.getUserPoint(userPoint.id())).thenReturn(userPoint);
+
+        //when
+        ArithmeticException e = assertThrows(ArithmeticException.class, () -> pointService.usePoint(userPoint.id(), usePoint));
+
+        //then
+        assertThat(e.getClass().getSimpleName()).isEqualTo("ArithmeticException");
+    }
+
+    /**
      * 0원 미만의 포인트를 사용하는 테스트
      */
     @Test

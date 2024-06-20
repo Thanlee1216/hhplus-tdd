@@ -62,6 +62,9 @@ public class PointServiceImpl implements PointService {
             throw new NullPointerException();
         }
         UserPoint userPoint = repository.getUserPoint(id);
+        if(userPoint.point() - amount < 0) {
+            throw new ArithmeticException();
+        }
         PointHistory pointHistory = repository.insertPointHistory(id, amount, TransactionType.USE, System.currentTimeMillis());
         return repository.insertUserPoint(userPoint.id(), userPoint.point() - pointHistory.amount());
     }
