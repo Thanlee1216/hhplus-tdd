@@ -77,6 +77,9 @@ class PointServiceTest {
         assertThat(resultUserPoint.updateMillis()).isNotEqualTo(userPoint.updateMillis());//신규 생성된 user는 UserPoint.empty(id)의 결과인 System.currentTimeMillis()값을 가진다
     }
 
+    /**
+     * 존재하는 유저의 포인트 내역을 조회해오는 테스트
+     */
     @Test
     void 존재하는_유저의_포인트_내역을_조회한다() {
         //given
@@ -91,6 +94,9 @@ class PointServiceTest {
         assertThat(historyList.get(0).userId()).isEqualTo(id);
     }
 
+    /**
+     * 존재하지 않는 유저의 포인트 내역을 조회하는 테스트
+     */
     @Test
     void 존재하지_않는_유저의_포인트_내역을_조회하면_NP가_발생한다() {
         //given
@@ -104,6 +110,9 @@ class PointServiceTest {
         assertThat(e.getClass().getSimpleName()).isEqualTo("NullPointerException");
     }
 
+    /**
+     * 존재하는 유저의 포인트를 충전하는 테스트
+     */
     @Test
     void 존재하는_유저의_포인트를_충전한다() {
         //given
@@ -125,6 +134,9 @@ class PointServiceTest {
         assertThat(resultUserPoint.point()).isEqualTo(userPoint.point() + chargePoint);
     }
 
+    /**
+     * 존재하지 않는 유저의 포인트를 충전하는 테스트
+     */
     @Test
     void 존재하지_않는_유저의_포인트를_충전하면_NP가_발생한다() {
         //given
@@ -139,6 +151,9 @@ class PointServiceTest {
         assertThat(e.getClass().getSimpleName()).isEqualTo("NullPointerException");
     }
 
+    /**
+     * 0원 미만의 포인트를 충전하는 테스트
+     */
     @Test
     void 충전_금액이_0원_미만이면_예외가_발생한다() {
         //given
@@ -152,6 +167,9 @@ class PointServiceTest {
         assertThat(e.getClass().getSimpleName()).isEqualTo("IllegalArgumentException");
     }
 
+    /**
+     * 존재하는 유저의 포인트를 사용하는 테스트
+     */
     @Test
     void 존재하는_유저의_포인트를_사용한다() {
         //given
@@ -173,6 +191,9 @@ class PointServiceTest {
         assertThat(resultUserPoint.point()).isEqualTo(userPoint.point() - usePoint);
     }
 
+    /**
+     * 존재하지 않는 유저의 포인트를 사용하는 테스트
+     */
     @Test
     void 존재하지_않는_유저의_포인트를_사용하면_NP가_발생한다() {
         //given
@@ -187,6 +208,9 @@ class PointServiceTest {
         assertThat(e.getClass().getSimpleName()).isEqualTo("NullPointerException");
     }
 
+    /**
+     * 0원 미만의 포인트를 사용하는 테스트
+     */
     @Test
     void 사용_금액이_0원_미만이면_예외가_발생한다() {
         //given
