@@ -40,6 +40,9 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public UserPoint chargePoint(Long id, Long amount) {
+        if(amount < 0) {
+            throw new IllegalArgumentException();
+        }
         //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
         if(repository.getPointHistory(id).size() == 0) {
             throw new NullPointerException();
@@ -51,6 +54,9 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public UserPoint usePoint(Long id, Long amount) {
+        if(amount < 0) {
+            throw new IllegalArgumentException();
+        }
         //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
         if(repository.getPointHistory(id).size() == 0) {
             throw new NullPointerException();

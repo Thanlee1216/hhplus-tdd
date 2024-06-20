@@ -140,6 +140,19 @@ class PointServiceTest {
     }
 
     @Test
+    void 충전_금액이_0원_미만이면_예외가_발생한다() {
+        //given
+        UserPoint userPoint = UserPoint.empty(1L);
+        long chargePoint = -100L;
+
+        //when
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> pointService.chargePoint(userPoint.id(), chargePoint));
+
+        //then
+        assertThat(e.getClass().getSimpleName()).isEqualTo("IllegalArgumentException");
+    }
+
+    @Test
     void 존재하는_유저의_포인트를_사용한다() {
         //given
         UserPoint userPoint = UserPoint.empty(1L);
@@ -172,6 +185,19 @@ class PointServiceTest {
 
         //then
         assertThat(e.getClass().getSimpleName()).isEqualTo("NullPointerException");
+    }
+
+    @Test
+    void 사용_금액이_0원_미만이면_예외가_발생한다() {
+        //given
+        UserPoint userPoint = UserPoint.empty(1L);
+        long usePoint = -100L;
+
+        //when
+        IllegalArgumentException e = assertThrows(IllegalArgumentException.class, () -> pointService.usePoint(userPoint.id(), usePoint));
+
+        //then
+        assertThat(e.getClass().getSimpleName()).isEqualTo("IllegalArgumentException");
     }
   
 }
