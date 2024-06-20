@@ -68,7 +68,7 @@ class PointControllerTest {
      * @throws Exception
      */
     @Test
-    void 유저_포인트_내역_조회() throws Exception {
+    void 존재하는_유저의_포인트_내역을_조회한다() throws Exception {
 
         //given
         //MockBean 객체의 역할 부여
@@ -88,7 +88,7 @@ class PointControllerTest {
      * @throws Exception
      */
     @Test
-    void 유저_포인트_내역_조회_실패() throws Exception {
+    void 존재하지_않는_유저의_포인트_내역을_조회하면_NP가_발생한다() throws Exception {
 
         //given
         //MockBean 객체의 역할 부여
@@ -109,7 +109,7 @@ class PointControllerTest {
      * @throws Exception
      */
     @Test
-    void 유저_포인트_충전() throws Exception {
+    void 존재하는_유저의_포인트를_충전한다() throws Exception {
 
         //given
         long amount = 100L;
@@ -134,7 +134,7 @@ class PointControllerTest {
      * @throws Exception
      */
     @Test
-    void 유저_포인트_충전_실패() throws Exception {
+    void 존재하지_않는_유저의_포인트를_충전하면_NP가_발생한다() throws Exception {
 
         //given
         long amount = 100L;
@@ -153,11 +153,34 @@ class PointControllerTest {
     }
 
     /**
+     * 충전하려는 포인트가 0포인트 미만인 경우의 테스트
+     * @throws Exception
+     */
+    @Test
+    void 충전_금액이_0포인트_미만이면_예외가_발생된다() throws Exception {
+
+        //given
+        long amount = -100L;
+
+        //MockBean 객체의 역할 부여
+        //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
+        when(pointService.chargePoint(id, amount)).thenThrow(IllegalArgumentException.class);
+
+        //when
+        ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/charge").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
+
+        //then
+        resultAcitons.andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("MINUS_VALUE")));
+    }
+
+    /**
      * id에 해당하는 유저의 포인트를 사용하는 테스트
      * @throws Exception
      */
     @Test
-    void 유저_포인트_사용() throws Exception {
+    void 존재하는_유저의_포인트를_사용한다() throws Exception {
 
         //given
         long amount = 100L;
@@ -182,7 +205,7 @@ class PointControllerTest {
      * @throws Exception
      */
     @Test
-    void 유저_포인트_사용_실패() throws Exception {
+    void 존재하지_않는_유저의_포인트를_사용하면_NP가_발생된다() throws Exception {
 
         //given
         long amount = 100L;
@@ -198,6 +221,29 @@ class PointControllerTest {
         resultAcitons.andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("NOT_EXIST_USER")));
+    }
+
+    /**
+     * 사용하려는 포인트가 0포인트 미만인 경우의 테스트
+     * @throws Exception
+     */
+    @Test
+    void 사용_금액이_0포인트_미만이면_예외가_발생된다() throws Exception {
+
+        //given
+        long amount = -100L;
+
+        //MockBean 객체의 역할 부여
+        //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
+        when(pointService.usePoint(id, amount)).thenThrow(IllegalArgumentException.class);
+
+        //when
+        ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/use").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
+
+        //then
+        resultAcitons.andDo(print())
+                .andExpect(status().isInternalServerError())
+                .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("MINUS_VALUE")));
     }
 
 }

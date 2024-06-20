@@ -58,6 +58,8 @@ public class PointController {
             return pointService.chargePoint(id, amount);
         }catch (NullPointerException e) {
             throw new PointException("NOT_EXIST_USER");
+        }catch (IllegalArgumentException e) {
+            throw new PointException("MINUS_VALUE");
         }
     }
 
@@ -73,6 +75,8 @@ public class PointController {
             return pointService.usePoint(id, amount);
         }catch (NullPointerException e) {
             throw new PointException("NOT_EXIST_USER");
+        }catch (IllegalArgumentException e) {
+            throw new PointException("MINUS_VALUE");
         }
     }
 }
