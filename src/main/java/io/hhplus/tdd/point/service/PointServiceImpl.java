@@ -20,8 +20,8 @@ public class PointServiceImpl implements PointService {
     @Override
     public UserPoint getUserPoint(Long id) {
         UserPoint userPoint = repository.getUserPoint(id);
-        long time = System.currentTimeMillis() - userPoint.updateMillis();
-        if(time < 500) { //0.5초 안에 수정되었다면 신규 계정으로 판단..? TODO - 의문이 드는 방법이기 때문에 대안을 생각해야함
+        //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
+        if(repository.getPointHistory(userPoint.id()).size() == 0) {
             userPoint = repository.insertUserPoint(userPoint.id(), userPoint.point());
             //신규 고객은 0포인트 충전 이력을 등록 TODO - 충전에 실패하면 롤백해야하나 UserPointTable에는 현재 삭제 메소드가 없기에 생략
             repository.insertPointHistory(userPoint.id(), userPoint.point(), TransactionType.CHARGE, System.currentTimeMillis());
@@ -31,16 +31,32 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public List<PointHistory> getPointHistory(Long id) {
-        return List.of();
+        List<PointHistory> historyList = repository.getPointHistory(id);
+        if(historyList.isEmpty()) {
+            throw new NullPointerException();
+        }
+        return historyList;
     }
 
     @Override
     public UserPoint chargePoint(Long id, Long amount) {
-        return null;
+        //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
+        if(repository.getPointHistory(id).size() == 0) {
+            throw new NullPointerException();
+        }
+        UserPoint userPoint = repository.getUserPoint(id);
+        PointHistory pointHistory = repository.insertPointHistory(id, amount, TransactionType.CHARGE, System.currentTimeMillis());
+        return repository.insertUserPoint(userPoint.id(), userPoint.point() + pointHistory.amount());
     }
 
     @Override
     public UserPoint usePoint(Long id, Long amount) {
-        return null;
+        //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
+        if(repository.getPointHistory(id).size() == 0) {
+            throw new NullPointerException();
+        }
+        UserPoint userPoint = repository.getUserPoint(id);
+        PointHistory pointHistory = repository.insertPointHistory(id, amount, TransactionType.USE, System.currentTimeMillis());
+        return repository.insertUserPoint(userPoint.id(), userPoint.point() - pointHistory.amount());
     }
 }
