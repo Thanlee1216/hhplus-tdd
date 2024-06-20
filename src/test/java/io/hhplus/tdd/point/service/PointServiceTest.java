@@ -48,7 +48,11 @@ class PointServiceTest {
     void 유저를_조회해온다() {
         //given
         long id = 1L;
-        when(pointRepository.getUserPoint(id)).thenReturn(new UserPoint(id, 0, 0));
+        UserPoint userpoint = new UserPoint(id, 0L, 0L);
+        PointHistory pointHistory = pointHistoryTable.insert(id, 0L, TransactionType.USE, System.currentTimeMillis());
+        when(pointRepository.getUserPoint(id)).thenReturn(userpoint);
+        when(pointRepository.insertUserPoint(id, 0L)).thenReturn(userpoint);
+        when(pointRepository.insertPointHistory(eq(id), eq(0L), eq(TransactionType.CHARGE), anyLong())).thenReturn(pointHistory);
 
         //when
         UserPoint userPoint = pointService.getUserPoint(id);
@@ -85,7 +89,7 @@ class PointServiceTest {
         //given
         long id = 1L;
         //포인트 충전, 사용의 내역이 1건도 없는 신규 사용자는 0포인트 충전 이력을 가지고 있다.
-        when(pointRepository.getPointHistory(id)).thenReturn(List.of(new PointHistory(1, id, 0, TransactionType.CHARGE, 0)));
+        when(pointRepository.getPointHistory(id)).thenReturn(List.of(new PointHistory(1L, id, 0L, TransactionType.CHARGE, 0L)));
 
         //when
         List<PointHistory> historyList = pointService.getPointHistory(id);
@@ -121,10 +125,10 @@ class PointServiceTest {
         long historyTime = System.currentTimeMillis();
         PointHistory pointHistory = pointHistoryTable.insert(userPoint.id(), chargePoint, TransactionType.CHARGE, historyTime);
         //모든 인수를 argument matcher로 만들어야 테스트 진행이 가능
-        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1, userPoint.id(), 0, TransactionType.CHARGE, 0)));
+        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1L, userPoint.id(), 0L, TransactionType.CHARGE, 0L)));
         when(pointRepository.getUserPoint(userPoint.id())).thenReturn(userPoint);
         when(pointRepository.insertPointHistory(eq(userPoint.id()), eq(chargePoint), eq(TransactionType.CHARGE), anyLong())).thenReturn(pointHistory);
-        when(pointRepository.insertUserPoint(userPoint.id(), userPoint.point() + chargePoint)).thenReturn(new UserPoint(userPoint.id(), userPoint.point() + chargePoint, 0));
+        when(pointRepository.insertUserPoint(userPoint.id(), userPoint.point() + chargePoint)).thenReturn(new UserPoint(userPoint.id(), userPoint.point() + chargePoint, 0L));
 
         //when
         UserPoint resultUserPoint = pointService.chargePoint(userPoint.id(), chargePoint);
@@ -173,15 +177,15 @@ class PointServiceTest {
     @Test
     void 존재하는_유저의_포인트를_사용한다() {
         //given
-        UserPoint userPoint = UserPoint.empty(1L);
+        UserPoint userPoint = new UserPoint(1L, 1000L, 0L);
         long usePoint = 100L;
         long historyTime = System.currentTimeMillis();
         PointHistory pointHistory = pointHistoryTable.insert(userPoint.id(), usePoint, TransactionType.USE, historyTime);
         //모든 인수를 argument matcher로 만들어야 테스트 진행이 가능
-        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1, userPoint.id(), 0, TransactionType.USE, 0)));
+        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1L, userPoint.id(), 0L, TransactionType.USE, 0L)));
         when(pointRepository.getUserPoint(userPoint.id())).thenReturn(userPoint);
         when(pointRepository.insertPointHistory(eq(userPoint.id()), eq(usePoint), eq(TransactionType.USE), anyLong())).thenReturn(pointHistory);
-        when(pointRepository.insertUserPoint(userPoint.id(), userPoint.point() - usePoint)).thenReturn(new UserPoint(userPoint.id(), userPoint.point() - usePoint, 0));
+        when(pointRepository.insertUserPoint(userPoint.id(), userPoint.point() - usePoint)).thenReturn(new UserPoint(userPoint.id(), userPoint.point() - usePoint, 0L));
 
         //when
         UserPoint resultUserPoint = pointService.usePoint(userPoint.id(), usePoint);
@@ -216,7 +220,7 @@ class PointServiceTest {
         //given
         UserPoint userPoint = UserPoint.empty(1L);
         long usePoint = 1000L;
-        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1, userPoint.id(), 0, TransactionType.USE, 0)));
+        when(pointRepository.getPointHistory(userPoint.id())).thenReturn(List.of(new PointHistory(1L, userPoint.id(), 0L, TransactionType.USE, 0L)));
         when(pointRepository.getUserPoint(userPoint.id())).thenReturn(userPoint);
 
         //when
