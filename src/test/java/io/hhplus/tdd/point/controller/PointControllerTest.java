@@ -49,12 +49,15 @@ class PointControllerTest {
     @Test
     void 유저를_조회하고_존재하지_않는_유저_조회_시_신규_유저로_등록한다() throws Exception {
 
+        //given
         //MockBean 객체의 역할 부여
         UserPoint userPoint = new UserPoint(id, 0, 0);
         when(pointService.getUserPoint(id)).thenReturn(userPoint);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(get("/point/" + id));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id));
@@ -67,11 +70,14 @@ class PointControllerTest {
     @Test
     void 유저_포인트_내역_조회() throws Exception {
 
+        //given
         //MockBean 객체의 역할 부여
         when(pointService.getPointHistory(id)).thenReturn(List.of(new PointHistory(1, id, 100, TransactionType.CHARGE, 0)));
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(get("/point/" + id + "/histories"));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].userId").value(id));
@@ -84,12 +90,15 @@ class PointControllerTest {
     @Test
     void 유저_포인트_내역_조회_실패() throws Exception {
 
+        //given
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
         when(pointService.getPointHistory(id)).thenThrow(NullPointerException.class);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(get("/point/" + id + "/histories"));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("NOT_EXIST_USER")));
@@ -102,6 +111,7 @@ class PointControllerTest {
     @Test
     void 유저_포인트_충전() throws Exception {
 
+        //given
         long amount = 100L;
         long defaultAmount = 0L; //기존 포인트
 
@@ -109,8 +119,10 @@ class PointControllerTest {
         UserPoint userPoint = new UserPoint(id, defaultAmount + amount, 0);
         when(pointService.chargePoint(id, amount)).thenReturn(userPoint);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/charge").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
@@ -124,14 +136,17 @@ class PointControllerTest {
     @Test
     void 유저_포인트_충전_실패() throws Exception {
 
+        //given
         long amount = 100L;
 
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
         when(pointService.chargePoint(id, amount)).thenThrow(NullPointerException.class);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/charge").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("NOT_EXIST_USER")));
@@ -144,6 +159,7 @@ class PointControllerTest {
     @Test
     void 유저_포인트_사용() throws Exception {
 
+        //given
         long amount = 100L;
         long defaultAmount = 200L; //기존 포인트
 
@@ -151,8 +167,10 @@ class PointControllerTest {
         UserPoint userPoint = new UserPoint(id, defaultAmount - amount, 0);
         when(pointService.usePoint(id, amount)).thenReturn(userPoint);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/use").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(id))
@@ -166,14 +184,17 @@ class PointControllerTest {
     @Test
     void 유저_포인트_사용_실패() throws Exception {
 
+        //given
         long amount = 100L;
 
         //MockBean 객체의 역할 부여
         //존재하지 않는 유저를 조회(NPE)할 경우 PointException을 발생시키는 테스트 세팅
         when(pointService.usePoint(id, amount)).thenThrow(NullPointerException.class);
 
+        //when
         ResultActions resultAcitons = mockMvc.perform(patch("/point/" + id + "/use").contentType(MediaType.APPLICATION_JSON).content(String.valueOf(amount)));
 
+        //then
         resultAcitons.andDo(print())
                 .andExpect(status().isInternalServerError())
                 .andExpect(jsonPath("$.message").value(ExceptionType.getMessage("NOT_EXIST_USER")));
