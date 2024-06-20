@@ -4,6 +4,7 @@ import java.util.Arrays;
 
 public enum ExceptionType {
     NOT_EXIST_USER("존재하지 않는 유저입니다.")
+    , MINUS_VALUE("0포인트 이상의 값을 넣어주세요.")
     , Exception("에러가 발생했습니다.")
     ;
 
