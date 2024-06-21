@@ -4,6 +4,7 @@ import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.point.repository.PointRepository;
+import lombok.Synchronized;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    @Synchronized
     public UserPoint getUserPoint(Long id) {
         UserPoint userPoint = repository.getUserPoint(id);
         //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
@@ -30,6 +32,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    @Synchronized
     public List<PointHistory> getPointHistory(Long id) {
         List<PointHistory> historyList = repository.getPointHistory(id);
         if(historyList.isEmpty()) {
@@ -39,6 +42,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    @Synchronized
     public UserPoint chargePoint(Long id, Long amount) {
         if(amount < 0) {
             throw new IllegalArgumentException();
@@ -53,6 +57,7 @@ public class PointServiceImpl implements PointService {
     }
 
     @Override
+    @Synchronized
     public UserPoint usePoint(Long id, Long amount) {
         if(amount < 0) {
             throw new IllegalArgumentException();
