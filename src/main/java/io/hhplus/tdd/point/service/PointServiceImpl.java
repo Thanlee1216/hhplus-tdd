@@ -4,6 +4,8 @@ import io.hhplus.tdd.point.PointHistory;
 import io.hhplus.tdd.point.TransactionType;
 import io.hhplus.tdd.point.UserPoint;
 import io.hhplus.tdd.point.repository.PointRepository;
+import io.hhplus.tdd.point.util.LockUtil;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -13,7 +15,8 @@ import java.util.concurrent.locks.ReentrantLock;
 @Service
 public class PointServiceImpl implements PointService {
 
-    private final Lock lock = new ReentrantLock();
+    @Autowired
+    LockUtil lockUtil;
 
     PointRepository repository;
 
@@ -23,7 +26,7 @@ public class PointServiceImpl implements PointService {
 
     @Override
     public UserPoint getUserPoint(Long id) {
-        lock.lock();
+        lockUtil.lock(id);
         try {
             UserPoint userPoint = repository.getUserPoint(id);
             //포인트 이력이 많아지게 되면 소요시간이 어마무시하게 늘어나겠지만 실제 DB를 쓴다면 count 집계 함수의 결과로 변경해준다는 가정으로 만든 조건문
@@ -34,13 +37,13 @@ public class PointServiceImpl implements PointService {
             }
             return userPoint;
         }finally {
-            lock.unlock();
+            lockUtil.unlock();
         }
     }
 
     @Override
     public List<PointHistory> getPointHistory(Long id) {
-        lock.lock();
+        lockUtil.lock(id);
         try {
             List<PointHistory>historyList = repository.getPointHistory(id);
             if(historyList.isEmpty()) {
@@ -48,13 +51,13 @@ public class PointServiceImpl implements PointService {
             }
             return historyList;
         }finally {
-            lock.unlock();
+            lockUtil.unlock();
         }
     }
 
     @Override
     public UserPoint chargePoint(Long id, Long amount) {
-        lock.lock();
+        lockUtil.lock(id);
         try {
             if(amount < 0) {
                 throw new IllegalArgumentException();
@@ -67,13 +70,13 @@ public class PointServiceImpl implements PointService {
             PointHistory pointHistory = repository.insertPointHistory(id, amount, TransactionType.CHARGE, System.currentTimeMillis());
             return repository.insertUserPoint(userPoint.id(), userPoint.point() + pointHistory.amount());
         }finally {
-            lock.unlock();
+            lockUtil.unlock();
         }
     }
 
     @Override
     public UserPoint usePoint(Long id, Long amount) {
-        lock.lock();
+        lockUtil.lock(id);
         try {
             if (amount < 0) {
                 throw new IllegalArgumentException();
@@ -89,7 +92,7 @@ public class PointServiceImpl implements PointService {
             PointHistory pointHistory = repository.insertPointHistory(id, amount, TransactionType.USE, System.currentTimeMillis());
             return repository.insertUserPoint(userPoint.id(), userPoint.point() - pointHistory.amount());
         }finally {
-            lock.unlock();
+            lockUtil.unlock();
         }
     }
 }
